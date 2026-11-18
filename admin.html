@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>商城管理后台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --nav: #111827;
+      --primary: #2563eb;
+      --success: #15803d;
+      --danger: #dc2626;
+      --warning: #b45309;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --surface: #ffffff;
+      --background: #f3f4f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-width: 320px;
+      background: var(--background);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .header-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--nav);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(17, 24, 39, 0.2);
+    }
+
+    .nav-content {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      padding: 4px 8px;
+      border: 1px solid #4b5563;
+      border-radius: 5px;
+      color: #bfdbfe;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .btn-reset {
+      padding: 9px 16px;
+      border: 1px solid #ef4444;
+      border-radius: 6px;
+      background: #b91c1c;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: #991b1b;
+    }
+
+    .tab-wrap {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .tab-header {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-header button {
+      padding: 10px 20px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: var(--surface);
+      color: #4b5563;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .tab-header button:hover {
+      border-color: #9ca3af;
+      color: var(--nav);
+    }
+
+    .tab-header button.active {
+      border-color: var(--nav);
+      background: var(--nav);
+      color: #fff;
+    }
+
+    .panel {
+      display: none;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: 0 2px 8px rgba(17, 24, 39, 0.04);
+    }
+
+    .panel.show {
+      display: block;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .panel-heading h2 {
+      margin-bottom: 6px;
+      color: var(--nav);
+      font-size: 18px;
+    }
+
+    .tip {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .feedback {
+      min-height: 20px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .feedback.success {
+      color: var(--success);
+    }
+
+    .feedback.error {
+      color: var(--danger);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 940px;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .product-name {
+      min-width: 150px;
+      font-weight: 500;
+    }
+
+    .number-input {
+      width: 110px;
+      padding: 7px 9px;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    .number-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .action-cell {
+      min-width: 150px;
+      white-space: nowrap;
+    }
+
+    .action-btn {
+      margin: 2px 4px 2px 0;
+      padding: 6px 11px;
+      border: 0;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .action-btn:hover {
+      opacity: 0.86;
+    }
+
+    .btn-save,
+    .btn-send {
+      background: var(--primary);
+    }
+
+    .btn-off {
+      background: #6b7280;
+    }
+
+    .btn-on {
+      background: var(--success);
+    }
+
+    .btn-cancel {
+      background: var(--danger);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-on,
+    .status-shipped {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-off,
+    .status-canceled {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .order-products {
+      min-width: 240px;
+      max-width: 460px;
+      line-height: 1.6;
+    }
+
+    .order-total {
+      color: #b91c1c;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .empty-cell {
+      padding: 48px 20px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .muted {
+      color: #9ca3af;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card {
+      position: relative;
+      padding: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #fff;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--primary);
+    }
+
+    .metric-card:nth-child(2)::before {
+      background: #0891b2;
+    }
+
+    .metric-card:nth-child(3)::before {
+      background: #7c3aed;
+    }
+
+    .metric-card:nth-child(4)::before {
+      background: #6b7280;
+    }
+
+    .metric-label {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric-value {
+      margin-bottom: 8px;
+      color: var(--nav);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .metric-note {
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .chart-card {
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #fff;
+    }
+
+    .chart-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .chart-heading h3,
+    .advice-card h3 {
+      color: var(--nav);
+      font-size: 16px;
+    }
+
+    .chart-heading span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 140px) minmax(100px, 1fr) 60px;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .bar-label {
+      overflow: hidden;
+      color: #4b5563;
+      font-size: 13px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eef2f7;
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 3px;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #60a5fa);
+    }
+
+    .bar-value {
+      color: #374151;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .status-stack {
+      display: flex;
+      height: 20px;
+      margin: 8px 0 22px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eef2f7;
+    }
+
+    .status-segment {
+      height: 100%;
+    }
+
+    .status-legend {
+      display: grid;
+      gap: 13px;
+    }
+
+    .status-legend-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 13px;
+    }
+
+    .status-legend-label {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      color: #4b5563;
+    }
+
+    .status-dot {
+      flex: 0 0 auto;
+      width: 9px;
+      height: 9px;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
+
+    .status-legend-value {
+      color: #374151;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .advice-card {
+      margin-top: 18px;
+      padding: 20px;
+      border: 1px solid #bfdbfe;
+      border-radius: 9px;
+      background: #eff6ff;
+    }
+
+    .advice-card h3 {
+      margin-bottom: 10px;
+    }
+
+    .advice-card p {
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .dashboard-empty {
+      padding: 34px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .dashboard-refresh {
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 8px 14px;
+    }
+
+    @media (max-width: 1000px) {
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-content,
+      .tab-wrap {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .brand h1 {
+        font-size: 17px;
+      }
+
+      .brand-badge {
+        display: none;
+      }
+
+      .btn-reset {
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+
+      .panel {
+        padding: 14px;
+      }
+
+      .tab-header button {
+        flex: 1;
+        padding: 10px 8px;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-value {
+        font-size: 24px;
+      }
+
+      .panel-heading {
+        flex-direction: column;
+      }
+
+      .bar-row {
+        grid-template-columns: minmax(80px, 110px) minmax(70px, 1fr) 52px;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header-nav">
+    <div class="nav-content">
+      <div class="brand">
+        <span class="brand-badge">ADMIN</span>
+        <h1>商城管理后台</h1>
+      </div>
+      <button class="btn-reset" id="reset-demo" type="button">重置演示数据</button>
+    </div>
+  </header>
+
+  <main class="tab-wrap">
+    <div class="tab-header" role="tablist" aria-label="后台管理模块">
+      <button class="active" data-tab="product" type="button" onclick="switchTab('product')">商品 SKU 管理</button>
+      <button data-tab="dashboard" type="button" onclick="switchTab('dashboard')">数据看板</button>
+      <button data-tab="order" type="button" onclick="switchTab('order')">订单管理</button>
+    </div>
+
+    <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+
+    <section class="panel show" id="panel-product">
+      <div class="panel-heading">
+        <div>
+          <h2>商品 SKU 列表</h2>
+          <p class="tip">与店铺端共用 haowu_products_v1。修改价格或库存后点击保存；下架商品及其购物车条目会在店铺端自动移除。</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>商品名称</th>
+              <th>品类</th>
+              <th>规格</th>
+              <th>价格（元）</th>
+              <th>库存</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="product-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-dashboard">
+      <div class="panel-heading">
+        <div>
+          <h2>经营数据看板</h2>
+          <p class="tip">成交金额统计待发货、已支付、已发货和已完成订单；待支付、已取消订单不计入成交。</p>
+        </div>
+        <button class="action-btn btn-save dashboard-refresh" type="button" onclick="renderDashboard()">刷新数据</button>
+      </div>
+
+      <div class="metric-grid">
+        <article class="metric-card">
+          <div class="metric-label">成交金额 GMV</div>
+          <div class="metric-value" id="metric-gmv">¥0.00</div>
+          <div class="metric-note">已支付及之后状态的订单实付合计</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">成交订单数</div>
+          <div class="metric-value" id="metric-order-count">0</div>
+          <div class="metric-note">计入 GMV 的订单数量</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">客单价</div>
+          <div class="metric-value" id="metric-aov">¥0.00</div>
+          <div class="metric-note">成交金额 ÷ 成交订单数</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">取消单数</div>
+          <div class="metric-value" id="metric-canceled-count">0</div>
+          <div class="metric-note">当前全部已取消订单</div>
+        </article>
+      </div>
+
+      <div class="dashboard-grid">
+        <section class="chart-card">
+          <div class="chart-heading">
+            <h3>商品销量 TOP5</h3>
+            <span>按成交商品件数排序</span>
+          </div>
+          <div id="top-products-chart"></div>
+        </section>
+
+        <section class="chart-card">
+          <div class="chart-heading">
+            <h3>订单状态分布</h3>
+            <span>全部订单</span>
+          </div>
+          <div id="order-status-chart"></div>
+        </section>
+      </div>
+
+      <section class="advice-card">
+        <h3>经营建议</h3>
+        <p id="business-advice">暂无数据。</p>
+      </section>
+    </section>
+
+    <section class="panel" id="panel-order">
+      <div class="panel-heading">
+        <div>
+          <h2>全部订单</h2>
+          <p class="tip">与店铺端共用 haowu_orders_v1。待发货订单可执行发货或取消操作，已处理订单不可重复操作。</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>订单 ID</th>
+              <th>商品信息</th>
+              <th>下单时间</th>
+              <th>金额（元）</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="order-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const KEY_PRODUCT = 'haowu_products_v1';
+    const KEY_ORDER = 'haowu_orders_v1';
+
+    // 与店铺端默认商品保持一致；重置时恢复此种子数据。
+    const seedProducts = [
+      { id: 1, name: '智能手机 Pro', category: '手机', spec: '标准版', price: 3299, stock: 100, status: 1, icon: '📱', tag: '新品', catClass: 'cat-mobile' },
+      { id: 2, name: '智能手机 SE', category: '手机', spec: '标准版', price: 1299, stock: 100, status: 1, icon: '📱', tag: '热卖', catClass: 'cat-mobile' },
+      { id: 3, name: '商务手机 Max', category: '手机', spec: '标准版', price: 4599, stock: 100, status: 1, icon: '📱', tag: '推荐', catClass: 'cat-mobile' },
+      { id: 4, name: '学生手机 Lite', category: '手机', spec: '标准版', price: 899, stock: 100, status: 1, icon: '📱', tag: '超值', catClass: 'cat-mobile' },
+      { id: 5, name: '笔记本电脑 14寸', category: '电脑', spec: '标准版', price: 4999, stock: 100, status: 1, icon: '💻', tag: '新品', catClass: 'cat-computer' },
+      { id: 6, name: '游戏笔记本', category: '电脑', spec: '标准版', price: 6799, stock: 100, status: 1, icon: '💻', tag: '热卖', catClass: 'cat-computer' },
+      { id: 7, name: '轻薄办公本', category: '电脑', spec: '标准版', price: 3699, stock: 100, status: 1, icon: '💻', tag: '推荐', catClass: 'cat-computer' },
+      { id: 8, name: '平板电脑 Pro', category: '电脑', spec: '标准版', price: 2599, stock: 100, status: 1, icon: '💻', tag: '新品', catClass: 'cat-computer' },
+      { id: 9, name: '蓝牙耳机', category: '配件', spec: '标准版', price: 159, stock: 100, status: 1, icon: '🎧', tag: '热卖', catClass: 'cat-accessory' },
+      { id: 10, name: '无线鼠标', category: '配件', spec: '标准版', price: 79, stock: 100, status: 1, icon: '🖱️', tag: '超值', catClass: 'cat-accessory' },
+      { id: 11, name: '机械键盘', category: '配件', spec: '标准版', price: 229, stock: 100, status: 1, icon: '⌨️', tag: '推荐', catClass: 'cat-accessory' },
+      { id: 12, name: 'USB-C 扩展坞', category: '配件', spec: '标准版', price: 199, stock: 100, status: 1, icon: '🔌', tag: '新品', catClass: 'cat-accessory' },
+      { id: 13, name: '智能手表', category: '智能穿戴', spec: '标准版', price: 1299, stock: 100, status: 1, icon: '⌚', tag: '热卖', catClass: 'cat-wearable' },
+      { id: 14, name: '运动手环', category: '智能穿戴', spec: '标准版', price: 399, stock: 100, status: 1, icon: '📿', tag: '推荐', catClass: 'cat-wearable' },
+      { id: 15, name: '智能眼镜', category: '智能穿戴', spec: '标准版', price: 1899, stock: 100, status: 1, icon: '👓', tag: '新品', catClass: 'cat-wearable' },
+      { id: 16, name: '儿童电话手表', category: '智能穿戴', spec: '标准版', price: 599, stock: 100, status: 1, icon: '⌚', tag: '超值', catClass: 'cat-wearable' }
+    ];
+
+    let currentTab = 'product';
+
+    function cloneSeedProducts() {
+      return seedProducts.map(item => ({ ...item }));
+    }
+
+    function readList(key) {
+      const raw = localStorage.getItem(key);
+      if (raw === null) return null;
+
+      try {
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      } catch (error) {
+        console.warn(`本地数据读取失败：${key}`, error);
+        return [];
+      }
+    }
+
+    function writeList(key, list) {
+      localStorage.setItem(key, JSON.stringify(list));
+    }
+
+    function getProducts() {
+      const list = readList(KEY_PRODUCT);
+      if (list !== null) return list;
+
+      const seeds = cloneSeedProducts();
+      writeList(KEY_PRODUCT, seeds);
+      return seeds;
+    }
+
+    function saveProducts(list) {
+      writeList(KEY_PRODUCT, list);
+    }
+
+    function getOrders() {
+      return readList(KEY_ORDER) || [];
+    }
+
+    function saveOrders(list) {
+      writeList(KEY_ORDER, list);
+    }
+
+    function escapeHtml(value) {
+      const entities = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return String(value ?? '').replace(/[&<>"']/g, char => entities[char]);
+    }
+
+    function formatMoney(value) {
+      const amount = Number(value);
+      return Number.isFinite(amount) ? amount.toFixed(2) : '0.00';
+    }
+
+    function showFeedback(message, type = 'success') {
+      const feedback = document.getElementById('feedback');
+      feedback.textContent = message;
+      feedback.className = `feedback ${type}`;
+    }
+
+    const REVENUE_STATUSES = new Set(['pending', 'paid', 'shipped', 'completed']);
+    const FREE_SHIPPING_REFERENCE = 199;
+    const DASHBOARD_STATUS_META = {
+      unpaid: { label: '待支付', color: '#3b82f6' },
+      pending: { label: '待发货', color: '#f59e0b' },
+      paid: { label: '已支付', color: '#8b5cf6' },
+      shipped: { label: '已发货', color: '#22c55e' },
+      completed: { label: '已完成', color: '#14b8a6' },
+      canceled: { label: '已取消', color: '#9ca3af' },
+      unknown: { label: '未知状态', color: '#64748b' }
+    };
+
+    function normalizeDashboardStatus(status) {
+      const aliases = {
+        pending_payment: 'unpaid',
+        unpaid: 'unpaid',
+        done: 'completed',
+        finished: 'completed',
+        cancelled: 'canceled'
+      };
+      return aliases[status] || status || 'unknown';
+    }
+
+    function getDashboardStatusMeta(status) {
+      return DASHBOARD_STATUS_META[status] || { label: status, color: '#64748b' };
+    }
+
+    function isRevenueOrder(order) {
+      return REVENUE_STATUSES.has(normalizeDashboardStatus(order.status));
+    }
+
+    function getOrderPaidAmount(order) {
+      const candidates = [order.paidAmount, order.actualPaid, order.total];
+      for (const value of candidates) {
+        if (value === null || value === undefined || value === '') continue;
+        const amount = Number(value);
+        if (Number.isFinite(amount)) return Math.max(0, amount);
+      }
+      return 0;
+    }
+
+    function getOrderSalesItems(order) {
+      if (Array.isArray(order.items) && order.items.length > 0) {
+        return order.items.map((item, index) => {
+          const quantity = Number(item.count ?? item.quantity ?? 1);
+          return {
+            id: item.id === null || item.id === undefined ? null : Number(item.id),
+            name: String(item.name || item.productName || `商品 ${index + 1}`),
+            quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 0
+          };
+        }).filter(item => item.quantity > 0);
+      }
+
+      const productText = String(order.productName || '').trim();
+      if (!productText) return [];
+
+      return productText.split(/[；;]/).map((part, index) => {
+        const text = part.trim();
+        const match = text.match(/^(.*?)\s*[×xX*]\s*(\d+(?:\.\d+)?)\s*$/);
+        const quantity = match ? Number(match[2]) : 1;
+        return {
+          id: null,
+          name: match ? match[1].trim() : (text || `商品 ${index + 1}`),
+          quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 0
+        };
+      }).filter(item => item.name && item.quantity > 0);
+    }
+
+    function getTopProducts(revenueOrders) {
+      const salesMap = new Map();
+
+      revenueOrders.forEach(order => {
+        getOrderSalesItems(order).forEach(item => {
+          // 兼容只有商品名称的历史订单，同一商品按名称合并销量。
+          const key = `name:${item.name}`;
+          if (!salesMap.has(key)) {
+            salesMap.set(key, { id: item.id, name: item.name, quantity: 0 });
+          }
+          const product = salesMap.get(key);
+          if (product.id === null && item.id !== null) product.id = item.id;
+          product.name = item.name || product.name;
+          product.quantity += item.quantity;
+        });
+      });
+
+      return [...salesMap.values()]
+        .sort((a, b) => b.quantity - a.quantity || a.name.localeCompare(b.name, 'zh-CN'))
+        .slice(0, 5);
+    }
+
+    function buildBusinessAdvice(orders, products, revenueOrders, topProducts, averageOrderValue) {
+      if (orders.length === 0) {
+        return '当前暂无订单数据。建议先通过商品推广和优惠活动获取首批订单，成交后再结合热销商品、客单价和免邮门槛调整经营策略。';
+      }
+
+      const suggestions = [];
+
+      if (topProducts.length > 0) {
+        const topProduct = topProducts[0];
+        const product = products.find(item => topProduct.id !== null && Number(item.id) === Number(topProduct.id))
+          || products.find(item => item.name === topProduct.name);
+
+        if (product) {
+          const stock = Number(product.stock);
+          const safeStock = Math.max(10, Math.ceil(topProduct.quantity * 1.5));
+          if (Number.isFinite(stock) && stock <= safeStock) {
+            suggestions.push(`热销商品“${topProduct.name}”累计成交 ${topProduct.quantity} 件，当前库存仅 ${stock} 件，建议优先补货并设置安全库存预警。`);
+          } else {
+            suggestions.push(`热销商品“${topProduct.name}”累计成交 ${topProduct.quantity} 件，当前库存 ${Number.isFinite(stock) ? stock : 0} 件，建议结合销售速度保持合理库存。`);
+          }
+        } else {
+          suggestions.push(`热销商品“${topProduct.name}”累计成交 ${topProduct.quantity} 件，建议持续关注其库存与销售趋势。`);
+        }
+      } else {
+        suggestions.push('当前暂无成交商品明细，可在订单中补充商品信息以完善销量分析。');
+      }
+
+      const unpaidCount = orders.filter(order => normalizeDashboardStatus(order.status) === 'unpaid').length;
+      if (unpaidCount > 0) {
+        suggestions.push(`当前有 ${unpaidCount} 笔待支付订单，建议通过订单提醒或限时优惠促进支付转化。`);
+      }
+
+      if (revenueOrders.length === 0) {
+        suggestions.push('当前尚无成交订单，建议先跟进支付转化，成交后再评估免邮门槛与商品组合。');
+      } else if (averageOrderValue < FREE_SHIPPING_REFERENCE) {
+        const gap = FREE_SHIPPING_REFERENCE - averageOrderValue;
+        suggestions.push(`当前客单价为 ¥${formatMoney(averageOrderValue)}，距离 ¥${FREE_SHIPPING_REFERENCE} 免邮参考门槛还差 ¥${formatMoney(gap)}，可通过凑单专区或套装推荐提高连带购买。`);
+      } else {
+        suggestions.push(`当前客单价为 ¥${formatMoney(averageOrderValue)}，已达到 ¥${FREE_SHIPPING_REFERENCE} 免邮参考门槛，可维持现有门槛并关注高客单组合的表现。`);
+      }
+
+      return suggestions.join(' ');
+    }
+
+    function renderDashboard() {
+      const orders = getOrders();
+      const products = getProducts();
+      const revenueOrders = orders.filter(isRevenueOrder);
+      const gmv = revenueOrders.reduce((sum, order) => sum + getOrderPaidAmount(order), 0);
+      const orderCount = revenueOrders.length;
+      const averageOrderValue = orderCount > 0 ? gmv / orderCount : 0;
+      const canceledCount = orders.filter(order => normalizeDashboardStatus(order.status) === 'canceled').length;
+
+      document.getElementById('metric-gmv').textContent = `¥${formatMoney(gmv)}`;
+      document.getElementById('metric-order-count').textContent = String(orderCount);
+      document.getElementById('metric-aov').textContent = `¥${formatMoney(averageOrderValue)}`;
+      document.getElementById('metric-canceled-count').textContent = String(canceledCount);
+
+      const topProducts = getTopProducts(revenueOrders);
+      const topProductsChart = document.getElementById('top-products-chart');
+
+      if (topProducts.length === 0) {
+        topProductsChart.innerHTML = '<div class="dashboard-empty">暂无成交商品数据</div>';
+      } else {
+        const maxQuantity = Math.max(...topProducts.map(item => item.quantity), 1);
+        topProductsChart.innerHTML = topProducts.map((item, index) => {
+          const width = item.quantity / maxQuantity * 100;
+          return `
+            <div class="bar-row">
+              <div class="bar-label" title="${escapeHtml(item.name)}">${index + 1}. ${escapeHtml(item.name)}</div>
+              <div class="bar-track" aria-hidden="true">
+                <div class="bar-fill" style="width:${width}%"></div>
+              </div>
+              <div class="bar-value">${item.quantity} 件</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const statusChart = document.getElementById('order-status-chart');
+      if (orders.length === 0) {
+        statusChart.innerHTML = '<div class="dashboard-empty">暂无订单状态数据</div>';
+      } else {
+        const counts = new Map();
+        orders.forEach(order => {
+          const status = normalizeDashboardStatus(order.status);
+          counts.set(status, (counts.get(status) || 0) + 1);
+        });
+
+        const statusOrder = ['unpaid', 'pending', 'paid', 'shipped', 'completed', 'canceled', 'unknown'];
+        const rows = [...counts.entries()].map(([status, count]) => ({ status, count }))
+          .sort((a, b) => {
+            const aIndex = statusOrder.includes(a.status) ? statusOrder.indexOf(a.status) : statusOrder.length;
+            const bIndex = statusOrder.includes(b.status) ? statusOrder.indexOf(b.status) : statusOrder.length;
+            return aIndex - bIndex || b.count - a.count;
+          });
+
+        const segments = rows.map(row => {
+          const meta = getDashboardStatusMeta(row.status);
+          const percentage = row.count / orders.length * 100;
+          return `<div class="status-segment" style="width:${percentage}%;background:${meta.color}" title="${escapeHtml(meta.label)} ${row.count} 单"></div>`;
+        }).join('');
+
+        const legends = rows.map(row => {
+          const meta = getDashboardStatusMeta(row.status);
+          const percentage = Number((row.count / orders.length * 100).toFixed(1));
+          return `
+            <div class="status-legend-row">
+              <div class="status-legend-label">
+                <span class="status-dot" style="background:${meta.color}"></span>
+                ${escapeHtml(meta.label)}
+              </div>
+              <div class="status-legend-value">${row.count} 单（${percentage}%）</div>
+            </div>
+          `;
+        }).join('');
+
+        statusChart.innerHTML = `
+          <div class="status-stack" aria-label="订单状态分布">${segments}</div>
+          <div class="status-legend">${legends}</div>
+        `;
+      }
+
+      document.getElementById('business-advice').textContent = buildBusinessAdvice(
+        orders,
+        products,
+        revenueOrders,
+        topProducts,
+        averageOrderValue
+      );
+    }
+
+    function switchTab(tabName) {
+      currentTab = tabName;
+      document.querySelectorAll('.tab-header button').forEach(button => {
+        button.classList.toggle('active', button.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('show'));
+      document.getElementById(`panel-${tabName}`).classList.add('show');
+      showFeedback('');
+
+      if (tabName === 'product') renderProduct();
+      if (tabName === 'dashboard') renderDashboard();
+      if (tabName === 'order') renderOrder();
+    }
+
+    function renderProduct() {
+      const list = getProducts();
+      const tbody = document.getElementById('product-body');
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td class="empty-cell" colspan="8">暂无商品，可点击右上角“重置演示数据”恢复商品。</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(item => {
+        const id = Number(item.id);
+        const isOn = Number(item.status) === 1;
+        return `
+          <tr>
+            <td>${escapeHtml(item.id)}</td>
+            <td class="product-name">${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.category)}</td>
+            <td>${escapeHtml(item.spec || '标准版')}</td>
+            <td>
+              <input class="number-input" id="price-${id}" type="number" min="0" step="0.01"
+                value="${escapeHtml(item.price)}" aria-label="${escapeHtml(item.name)}价格" />
+            </td>
+            <td>
+              <input class="number-input" id="stock-${id}" type="number" min="0" step="1"
+                value="${escapeHtml(item.stock)}" aria-label="${escapeHtml(item.name)}库存" />
+            </td>
+            <td><span class="status ${isOn ? 'status-on' : 'status-off'}">${isOn ? '上架中' : '已下架'}</span></td>
+            <td class="action-cell">
+              <button class="action-btn btn-save" type="button" data-action="save" data-id="${id}">保存</button>
+              <button class="action-btn ${isOn ? 'btn-off' : 'btn-on'}" type="button" data-action="toggle" data-id="${id}">
+                ${isOn ? '下架' : '重新上架'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function saveProduct(id) {
+      const list = getProducts();
+      const target = list.find(item => Number(item.id) === id);
+      if (!target) {
+        showFeedback('未找到该商品，请刷新后重试。', 'error');
+        return;
+      }
+
+      const priceInput = document.getElementById(`price-${id}`);
+      const stockInput = document.getElementById(`stock-${id}`);
+      const price = Number(priceInput.value);
+      const stock = Number(stockInput.value);
+
+      if (!Number.isFinite(price) || price < 0) {
+        showFeedback('价格必须是大于或等于 0 的有效数字。', 'error');
+        priceInput.focus();
+        return;
+      }
+
+      if (!Number.isInteger(stock) || stock < 0) {
+        showFeedback('库存必须是大于或等于 0 的整数。', 'error');
+        stockInput.focus();
+        return;
+      }
+
+      target.price = price;
+      target.stock = stock;
+      saveProducts(list);
+      renderProduct();
+      showFeedback(`商品“${target.name}”已保存，店铺端可同步读取。`);
+    }
+
+    function toggleStatus(id) {
+      const list = getProducts();
+      const target = list.find(item => Number(item.id) === id);
+      if (!target) {
+        showFeedback('未找到该商品，请刷新后重试。', 'error');
+        return;
+      }
+
+      target.status = Number(target.status) === 1 ? 0 : 1;
+      saveProducts(list);
+      renderProduct();
+      showFeedback(`商品“${target.name}”已${target.status === 1 ? '重新上架' : '下架'}。`);
+    }
+
+    function getOrderProductName(order) {
+      if (order.productName) return order.productName;
+      if (!Array.isArray(order.items)) return '-';
+      return order.items.map(item => `${item.name || '商品'} × ${item.count || 1}`).join('；');
+    }
+
+    function renderOrder() {
+      const list = getOrders();
+      const tbody = document.getElementById('order-body');
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td class="empty-cell" colspan="6">暂无订单。店铺端提交结算后，订单会显示在这里。</td></tr>';
+        return;
+      }
+
+      const statusMap = {
+        pending: { text: '待发货', className: 'status-pending' },
+        shipped: { text: '已发货', className: 'status-shipped' },
+        canceled: { text: '已取消', className: 'status-canceled' }
+      };
+
+      tbody.innerHTML = list.map(order => {
+        const status = statusMap[order.status] || { text: '未知状态', className: 'status-off' };
+        const oid = String(order.oid ?? '');
+        const actions = order.status === 'pending'
+          ? `
+            <button class="action-btn btn-send" type="button" data-action="ship" data-oid="${escapeHtml(oid)}">发货</button>
+            <button class="action-btn btn-cancel" type="button" data-action="cancel" data-oid="${escapeHtml(oid)}">取消订单</button>
+          `
+          : '<span class="muted">已处理</span>';
+
+        return `
+          <tr>
+            <td>${escapeHtml(oid || '-')}</td>
+            <td class="order-products">${escapeHtml(getOrderProductName(order))}</td>
+            <td>${escapeHtml(order.time || '-')}</td>
+            <td class="order-total">¥${formatMoney(order.total)}</td>
+            <td><span class="status ${status.className}">${status.text}</span></td>
+            <td class="action-cell">${actions}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateOrderStatus(oid, status) {
+      const list = getOrders();
+      const order = list.find(item => String(item.oid) === String(oid));
+      if (!order) {
+        showFeedback('未找到该订单，请刷新后重试。', 'error');
+        return;
+      }
+
+      if (order.status !== 'pending') {
+        showFeedback('该订单已处理，不能重复操作。', 'error');
+        renderOrder();
+        return;
+      }
+
+      order.status = status;
+      saveOrders(list);
+      renderOrder();
+      showFeedback(`订单 ${oid} 已${status === 'shipped' ? '发货' : '取消'}。`);
+    }
+
+    function orderSend(oid) {
+      updateOrderStatus(oid, 'shipped');
+    }
+
+    function orderCancel(oid) {
+      if (!window.confirm(`确认取消订单 ${oid} 吗？`)) return;
+      updateOrderStatus(oid, 'canceled');
+    }
+
+    function resetDemoData() {
+      if (!window.confirm('确认重置演示数据吗？此操作会恢复全部种子商品并清空订单。')) return;
+
+      saveProducts(cloneSeedProducts());
+      saveOrders([]);
+      renderProduct();
+      renderDashboard();
+      renderOrder();
+      showFeedback('演示数据已重置：商品已恢复，订单已清空。');
+    }
+
+    document.getElementById('product-body').addEventListener('click', event => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+
+      const id = Number(button.dataset.id);
+      if (button.dataset.action === 'save') saveProduct(id);
+      if (button.dataset.action === 'toggle') toggleStatus(id);
+    });
+
+    document.getElementById('order-body').addEventListener('click', event => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+
+      if (button.dataset.action === 'ship') orderSend(button.dataset.oid);
+      if (button.dataset.action === 'cancel') orderCancel(button.dataset.oid);
+    });
+
+    document.getElementById('reset-demo').addEventListener('click', resetDemoData);
+
+    // 跨标签页监听本地数据变化；重新聚焦时执行一次请求式刷新。
+    window.addEventListener('storage', event => {
+      if (event.key === KEY_PRODUCT && currentTab === 'product') renderProduct();
+      if (event.key === KEY_ORDER && currentTab === 'order') renderOrder();
+      if ((event.key === KEY_PRODUCT || event.key === KEY_ORDER) && currentTab === 'dashboard') renderDashboard();
+    });
+
+    window.addEventListener('focus', () => {
+      if (currentTab === 'product') renderProduct();
+      if (currentTab === 'dashboard') renderDashboard();
+      if (currentTab === 'order') renderOrder();
+    });
+
+    getProducts();
+    if (readList(KEY_ORDER) === null) saveOrders([]);
+    renderProduct();
+    renderDashboard();
+    renderOrder();
+  </script>
+</body>
+</html>
