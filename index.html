@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>优品商城</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        background: #f5f7fb;
+        color: #222;
+    }
+
+    /* 顶部导航 */
+    header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: #fff;
+        padding: 16px 4%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+
+    nav a {
+        color: #fff;
+        text-decoration: none;
+        margin-left: 24px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.25s;
+    }
+
+    nav a:hover,
+    nav a.active {
+        color: #ffd166;
+        font-weight: bold;
+    }
+
+    /* 横幅 */
+    .banner {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        text-align: center;
+        padding: 50px 20px;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .container {
+        width: 92%;
+        max-width: 1200px;
+        margin: 40px auto;
+    }
+
+    .page-title {
+        font-size: 26px;
+        margin-bottom: 24px;
+        text-align: center;
+        color: #1e3c72;
+    }
+
+    /* 页面切换 */
+    .page {
+        display: none;
+    }
+
+    .page.show {
+        display: block;
+    }
+
+    /* 分类栏 */
+    .category-bar {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .category-btn {
+        padding: 10px 22px;
+        background: #fff;
+        border: 1px solid #d9e2f1;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        transition: 0.3s;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .category-btn:hover {
+        border-color: #2a5298;
+        color: #2a5298;
+    }
+
+    .category-btn.active {
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+        color: #fff;
+        border-color: #1e3c72;
+    }
+
+    /* 商品网格 */
+    .goods-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
+
+    .goods-item {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        transition: 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #eef2f8;
+    }
+
+    .goods-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 18px 40px rgba(42, 82, 152, 0.18);
+    }
+
+    /* 商品图标区：更精致的渐变插画区 */
+    .goods-img {
+        position: relative;
+        height: 200px;
+        border-radius: 16px;
+        margin: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .goods-img::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.8), transparent 50%);
+        pointer-events: none;
+    }
+
+    .goods-img .icon {
+        font-size: 72px;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+        z-index: 2;
+    }
+
+    /* 不同品类的图标区配色 */
+    .cat-mobile {
+        background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    }
+
+    .cat-computer {
+        background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    }
+
+    .cat-accessory {
+        background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    }
+
+    .cat-wearable {
+        background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    }
+
+    /* 手机与电脑：统一的精致线性插画 */
+    .product-icon .device-art {
+        width: 116px;
+        height: 116px;
+        overflow: visible;
+        filter: drop-shadow(0 14px 12px rgba(30, 60, 114, 0.22));
+    }
+
+    .product-icon {
+        line-height: 0;
+    }
+
+    /* 商品标签 */
+    .goods-tag {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #2a5298;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 3;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 已加入购物车的商品件数 */
+    .cart-count {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        min-width: 28px;
+        height: 28px;
+        padding: 0 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ff6b6b, #e63946);
+        color: #fff;
+        border: 2px solid rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 1;
+        z-index: 4;
+        box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+        pointer-events: none;
+    }
+
+    .cart-count[hidden] {
+        display: none;
+    }
+
+    .goods-body {
+        padding: 0 20px 22px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .goods-name {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #222;
+    }
+
+    .goods-category {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 10px;
+    }
+
+    .goods-price {
+        color: #e63946;
+        font-size: 22px;
+        font-weight: bold;
+        margin-top: auto;
+        margin-bottom: 14px;
+    }
+
+    .add-cart-btn {
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+        color: #fff;
+        padding: 11px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.3s;
+        letter-spacing: 1px;
+    }
+
+    .add-cart-btn:hover {
+        background: linear-gradient(135deg, #1e3c72, #16305c);
+        box-shadow: 0 8px 20px rgba(42, 82, 152, 0.3);
+    }
+
+    /* 购物车面板 */
+    .cart-box {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .cart-box h2 {
+        margin-bottom: 20px;
+        color: #1e3c72;
+    }
+
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .cart-item-info {
+        font-size: 15px;
+    }
+
+    .cart-item-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .cart-item-price {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .cart-actions {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .total-price {
+        margin-left: auto;
+        font-size: 20px;
+        color: #e63946;
+        font-weight: bold;
+    }
+
+    .clear-btn {
+        background: #6c757d;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .pay-btn {
+        background: linear-gradient(135deg, #06d6a0, #118c70);
+        color: #fff;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .del-btn {
+        background: #ef476f;
+        color: #fff;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .empty-cart {
+        text-align: center;
+        color: #999;
+        padding: 40px 0;
+    }
+
+    /* 我的页面 */
+    .user-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .user-avatar {
+        font-size: 80px;
+        margin-bottom: 16px;
+    }
+
+    .user-card h2 {
+        margin-bottom: 12px;
+        color: #1e3c72;
+    }
+
+    .user-card p {
+        color: #666;
+        margin-top: 8px;
+    }
+
+    footer {
+        background: #1e3c72;
+        color: #cfd8ff;
+        text-align: center;
+        padding: 24px;
+        margin-top: 60px;
+    }
+
+    /* 手机端 */
+    @media (max-width: 992px) {
+        .goods-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        header {
+            padding: 14px 4%;
+        }
+
+        nav a {
+            margin-left: 14px;
+            font-size: 14px;
+        }
+
+        .banner {
+            font-size: 22px;
+            padding: 40px 16px;
+        }
+
+        .goods-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-actions {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .total-price {
+            margin-left: 0;
+        }
+    }
+</style>
+</head>
+
+<body>
+<header>
+    <div class="logo">优品商城</div>
+    <nav>
+        <a onclick="switchPage('home')" class="active">首页</a>
+        <a onclick="switchPage('goods')">全部商品</a>
+        <a onclick="switchPage('cart')">购物车</a>
+        <a onclick="switchPage('mine')">我的</a>
+    </nav>
+</header>
+
+<div class="banner">精选好物 · 品质生活 · 放心选购</div>
+
+<div class="container">
+
+    <!-- 首页 -->
+    <div class="page show" id="home">
+        <h2 class="page-title">🔥 热门推荐</h2>
+        <div class="category-bar">
+            <button class="category-btn active" onclick="filterCategory('全部', 'home')">全部</button>
+            <button class="category-btn" onclick="filterCategory('手机', 'home')">手机</button>
+            <button class="category-btn" onclick="filterCategory('电脑', 'home')">电脑</button>
+            <button class="category-btn" onclick="filterCategory('配件', 'home')">配件</button>
+            <button class="category-btn" onclick="filterCategory('智能穿戴', 'home')">智能穿戴</button>
+        </div>
+        <div class="goods-grid" id="homeGrid"></div>
+    </div>
+
+    <!-- 全部商品页 -->
+    <div class="page" id="goods">
+        <h2 class="page-title">📦 全部商品</h2>
+        <div class="category-bar">
+            <button class="category-btn active" onclick="filterCategory('全部', 'goods')">全部</button>
+            <button class="category-btn" onclick="filterCategory('手机', 'goods')">手机</button>
+            <button class="category-btn" onclick="filterCategory('电脑', 'goods')">电脑</button>
+            <button class="category-btn" onclick="filterCategory('配件', 'goods')">配件</button>
+            <button class="category-btn" onclick="filterCategory('智能穿戴', 'goods')">智能穿戴</button>
+        </div>
+        <div class="goods-grid" id="goodsGrid"></div>
+    </div>
+
+    <!-- 购物车页 -->
+    <div class="page" id="cart">
+        <div class="cart-box">
+            <h2>🛒 我的购物车</h2>
+            <div id="cartList"></div>
+            <div class="cart-actions">
+                <button class="clear-btn" onclick="clearCart()">清空购物车</button>
+                <button class="pay-btn" onclick="submitOrder()">提交结算下单</button>
+                <div class="total-price">合计：¥<span id="totalPrice">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 我的页面 -->
+    <div class="page" id="mine">
+        <div class="user-card">
+            <div class="user-avatar">👤</div>
+            <h2>欢迎，用户</h2>
+            <p>账号：demo_user</p>
+            <p>会员等级：普通会员</p>
+            <p>邮箱：demo@example.com</p>
+        </div>
+    </div>
+
+</div>
+
+<footer>版权所有 © 优品商城 2026</footer>
+
+<script>
+    // 商品数据：16个商品，分4个品类
+    const GOODS_STORAGE_KEY = 'haowu_products_v1';
+    const ORDER_STORAGE_KEY = 'haowu_orders_v1';
+    const defaultGoodsList = [
+        { id: 1, name: "智能手机 Pro", category: "手机", price: 3299, icon: "📱", tag: "新品", catClass: "cat-mobile" },
+        { id: 2, name: "智能手机 SE", category: "手机", price: 1299, icon: "📱", tag: "热卖", catClass: "cat-mobile" },
+        { id: 3, name: "商务手机 Max", category: "手机", price: 4599, icon: "📱", tag: "推荐", catClass: "cat-mobile" },
+        { id: 4, name: "学生手机 Lite", category: "手机", price: 899, icon: "📱", tag: "超值", catClass: "cat-mobile" },
+
+        { id: 5, name: "笔记本电脑 14寸", category: "电脑", price: 4999, icon: "💻", tag: "新品", catClass: "cat-computer" },
+        { id: 6, name: "游戏笔记本", category: "电脑", price: 6799, icon: "💻", tag: "热卖", catClass: "cat-computer" },
+        { id: 7, name: "轻薄办公本", category: "电脑", price: 3699, icon: "💻", tag: "推荐", catClass: "cat-computer" },
+        { id: 8, name: "平板电脑 Pro", category: "电脑", price: 2599, icon: "💻", tag: "新品", catClass: "cat-computer" },
+
+        { id: 9, name: "蓝牙耳机", category: "配件", price: 159, icon: "🎧", tag: "热卖", catClass: "cat-accessory" },
+        { id: 10, name: "无线鼠标", category: "配件", price: 79, icon: "🖱️", tag: "超值", catClass: "cat-accessory" },
+        { id: 11, name: "机械键盘", category: "配件", price: 229, icon: "⌨️", tag: "推荐", catClass: "cat-accessory" },
+        { id: 12, name: "USB-C 扩展坞", category: "配件", price: 199, icon: "🔌", tag: "新品", catClass: "cat-accessory" },
+
+        { id: 13, name: "智能手表", category: "智能穿戴", price: 1299, icon: "⌚", tag: "热卖", catClass: "cat-wearable" },
+        { id: 14, name: "运动手环", category: "智能穿戴", price: 399, icon: "📿", tag: "推荐", catClass: "cat-wearable" },
+        { id: 15, name: "智能眼镜", category: "智能穿戴", price: 1899, icon: "👓", tag: "新品", catClass: "cat-wearable" },
+        { id: 16, name: "儿童电话手表", category: "智能穿戴", price: 599, icon: "⌚", tag: "超值", catClass: "cat-wearable" }
+    ];
+
+    // 与 admin 共用同一份商品数据；仅在首次打开或缓存无效时写入默认商品
+    const initialGoodsList = defaultGoodsList.map(item => ({
+        ...item,
+        spec: '标准版',
+        stock: 100,
+        status: 1
+    }));
+
+    function normalizeGoodsList(list) {
+        return list.map(item => {
+            const defaultItem = initialGoodsList.find(goods => goods.id === Number(item.id)) || {};
+            return {
+                spec: '标准版',
+                icon: '🛍️',
+                tag: '推荐',
+                catClass: 'cat-accessory',
+                ...defaultItem,
+                ...item,
+                id: Number(item.id),
+                stock: Number(item.stock ?? defaultItem.stock ?? 100),
+                status: Number(item.status ?? defaultItem.status ?? 1) === 0 ? 0 : 1
+            };
+        });
+    }
+
+    function loadGoods() {
+        const storedGoods = localStorage.getItem(GOODS_STORAGE_KEY);
+
+        if (storedGoods === null) {
+            localStorage.setItem(GOODS_STORAGE_KEY, JSON.stringify(initialGoodsList));
+            return initialGoodsList;
+        }
+
+        try {
+            const parsedGoods = JSON.parse(storedGoods);
+            if (!Array.isArray(parsedGoods)) throw new Error('商品缓存格式错误');
+            return normalizeGoodsList(parsedGoods);
+        } catch (error) {
+            localStorage.setItem(GOODS_STORAGE_KEY, JSON.stringify(initialGoodsList));
+            console.warn('商品缓存读取失败，已恢复默认商品。', error);
+            return initialGoodsList;
+        }
+    }
+
+    let goodsList = loadGoods();
+
+    const productIcons = {
+        1: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="phoneFrame" x1="36" y1="10" x2="88" y2="106" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#F8FBFF"/>
+                        <stop offset=".22" stop-color="#A9BDD6"/>
+                        <stop offset=".5" stop-color="#EEF5FF"/>
+                        <stop offset=".78" stop-color="#7388A6"/>
+                        <stop offset="1" stop-color="#DCE8F7"/>
+                    </linearGradient>
+                    <linearGradient id="phoneScreen" x1="41" y1="17" x2="82" y2="101" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#142F58"/>
+                        <stop offset=".45" stop-color="#2568A8"/>
+                        <stop offset="1" stop-color="#65E2CF"/>
+                    </linearGradient>
+                    <linearGradient id="phoneGlow" x1="45" y1="28" x2="74" y2="94" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#A5B8FF"/>
+                        <stop offset=".55" stop-color="#71E6E0"/>
+                        <stop offset="1" stop-color="#C7F9E9" stop-opacity=".15"/>
+                    </linearGradient>
+                    <clipPath id="phoneDisplay"><rect x="38" y="12" width="44" height="96" rx="11"/></clipPath>
+                </defs>
+                <ellipse cx="61" cy="111" rx="28" ry="4" fill="#24466D" opacity=".16"/>
+                <path d="M85 29v11M85 48v18M34 31v8M34 45v12" stroke="#7990AC" stroke-width="2" stroke-linecap="round"/>
+                <rect x="34" y="8" width="52" height="104" rx="15" fill="url(#phoneFrame)"/>
+                <rect x="36.5" y="10.5" width="47" height="99" rx="12.5" fill="#12243B"/>
+                <g clip-path="url(#phoneDisplay)">
+                    <rect x="38" y="12" width="44" height="96" fill="url(#phoneScreen)"/>
+                    <path d="M24 91C45 62 48 35 96 24" stroke="url(#phoneGlow)" stroke-width="19" opacity=".65"/>
+                    <path d="M26 105C54 81 72 80 94 40" stroke="#B9FFF1" stroke-width="8" opacity=".45"/>
+                    <circle cx="69" cy="49" r="28" stroke="#C6EEFF" stroke-width=".8" opacity=".22"/>
+                    <path d="M39 14h18L40 66z" fill="white" opacity=".12"/>
+                </g>
+                <rect x="51" y="16" width="18" height="5" rx="2.5" fill="#091728"/>
+                <circle cx="65" cy="18.5" r="1" fill="#547397"/>
+                <path d="M53 102h14" stroke="#E8FFFF" stroke-width="2.2" stroke-linecap="round" opacity=".8"/>
+                <path d="M41 10.5h29" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".9"/>
+            </svg>`,
+        2: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="seFrame" x1="35" y1="10" x2="85" y2="110" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFF1E9"/>
+                        <stop offset=".3" stop-color="#E6B5A5"/>
+                        <stop offset=".65" stop-color="#FFF4ED"/>
+                        <stop offset="1" stop-color="#B87970"/>
+                    </linearGradient>
+                    <linearGradient id="seScreen" x1="42" y1="17" x2="77" y2="103" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#4B244D"/>
+                        <stop offset=".5" stop-color="#B44F70"/>
+                        <stop offset="1" stop-color="#FFAC82"/>
+                    </linearGradient>
+                    <radialGradient id="seOrb">
+                        <stop stop-color="#FFE4B8"/>
+                        <stop offset="1" stop-color="#FF9B86" stop-opacity="0"/>
+                    </radialGradient>
+                    <clipPath id="seDisplay"><rect x="39" y="15" width="42" height="90" rx="12"/></clipPath>
+                </defs>
+                <ellipse cx="60" cy="112" rx="25" ry="3.5" fill="#663C54" opacity=".14"/>
+                <path d="M34 34v9M34 50v13M86 39v18" stroke="#B87F78" stroke-width="2" stroke-linecap="round"/>
+                <rect x="35" y="10" width="50" height="100" rx="17" fill="url(#seFrame)"/>
+                <rect x="37.5" y="12.5" width="45" height="95" rx="14.5" fill="#452D43"/>
+                <g clip-path="url(#seDisplay)">
+                    <rect x="39" y="15" width="42" height="90" fill="url(#seScreen)"/>
+                    <circle cx="68" cy="55" r="34" fill="url(#seOrb)"/>
+                    <circle cx="53" cy="70" r="24" stroke="#FFE9D1" stroke-width="1.2" opacity=".5"/>
+                    <circle cx="53" cy="70" r="17" stroke="#FFE9D1" stroke-width=".7" opacity=".35"/>
+                    <path d="M40 16h19L40 69z" fill="white" opacity=".1"/>
+                </g>
+                <path d="M49 12.5h22v5c0 2.2-1.8 4-4 4H53c-2.2 0-4-1.8-4-4v-5z" fill="#352638"/>
+                <path d="M55 15.5h10" stroke="#796474" stroke-width="1.4" stroke-linecap="round"/>
+                <circle cx="67" cy="15.5" r="1" fill="#AA7188"/>
+                <path d="M53 100h14" stroke="#FFF0E7" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+            </svg>`,
+        3: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="maxFrame" x1="30" y1="7" x2="90" y2="113" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#71809A"/>
+                        <stop offset=".2" stop-color="#27364C"/>
+                        <stop offset=".48" stop-color="#9AA9BC"/>
+                        <stop offset=".7" stop-color="#243249"/>
+                        <stop offset="1" stop-color="#687B96"/>
+                    </linearGradient>
+                    <linearGradient id="maxScreen" x1="36" y1="13" x2="84" y2="107" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#10172F"/>
+                        <stop offset=".48" stop-color="#303577"/>
+                        <stop offset="1" stop-color="#8759B5"/>
+                    </linearGradient>
+                    <linearGradient id="maxBeam" x1="42" y1="20" x2="78" y2="102" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#8F9FFF" stop-opacity="0"/>
+                        <stop offset=".5" stop-color="#BCA7FF"/>
+                        <stop offset="1" stop-color="#F0B6FF" stop-opacity=".15"/>
+                    </linearGradient>
+                    <clipPath id="maxDisplay"><rect x="35" y="12" width="50" height="96" rx="7"/></clipPath>
+                </defs>
+                <ellipse cx="60" cy="114" rx="30" ry="3.5" fill="#202842" opacity=".2"/>
+                <path d="M29 28v10M29 45v15M91 35v25" stroke="#46546B" stroke-width="2" stroke-linecap="round"/>
+                <rect x="30" y="7" width="60" height="106" rx="12" fill="url(#maxFrame)"/>
+                <rect x="33" y="10" width="54" height="100" rx="9" fill="#10182A"/>
+                <g clip-path="url(#maxDisplay)">
+                    <rect x="35" y="12" width="50" height="96" fill="url(#maxScreen)"/>
+                    <path d="M22 93L74 8h18L40 108z" fill="url(#maxBeam)" opacity=".6"/>
+                    <path d="M38 86L91 29M32 66l42-49M55 109l38-50" stroke="#B9C5FF" stroke-width=".8" opacity=".3"/>
+                    <path d="M40 79h16v16H40zM62 59h16v16H62zM45 43h10v10H45z" stroke="#D4D9FF" stroke-width=".7" opacity=".38"/>
+                    <path d="M36 13h14L36 60z" fill="white" opacity=".07"/>
+                </g>
+                <circle cx="60" cy="17" r="2.2" fill="#080E1B"/>
+                <circle cx="60" cy="17" r=".7" fill="#657AB5"/>
+                <path d="M51 102h18" stroke="#E3DFFF" stroke-width="2" stroke-linecap="round" opacity=".75"/>
+            </svg>`,
+        4: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="liteFrame" x1="37" y1="13" x2="83" y2="107" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#F4FFFC"/>
+                        <stop offset=".25" stop-color="#9BD8CC"/>
+                        <stop offset=".55" stop-color="#E8FFF8"/>
+                        <stop offset="1" stop-color="#66A99F"/>
+                    </linearGradient>
+                    <linearGradient id="liteScreen" x1="42" y1="18" x2="77" y2="101" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#D8FAF1"/>
+                        <stop offset=".45" stop-color="#75D8D2"/>
+                        <stop offset="1" stop-color="#3794BC"/>
+                    </linearGradient>
+                    <clipPath id="liteDisplay"><rect x="40" y="17" width="40" height="86" rx="10"/></clipPath>
+                </defs>
+                <ellipse cx="60" cy="109" rx="23" ry="3.5" fill="#276B76" opacity=".14"/>
+                <path d="M36 36v8M36 50v11M84 42v16" stroke="#78B8AE" stroke-width="1.8" stroke-linecap="round"/>
+                <rect x="37" y="13" width="46" height="94" rx="14" fill="url(#liteFrame)"/>
+                <rect x="39" y="15" width="42" height="90" rx="12" fill="#D9F2ED"/>
+                <g clip-path="url(#liteDisplay)">
+                    <rect x="40" y="17" width="40" height="86" fill="url(#liteScreen)"/>
+                    <circle cx="68" cy="40" r="14" fill="#FFF4B0" opacity=".9"/>
+                    <path d="M28 81c17-17 30-17 49-4s28 5 33-2v31H28V81z" fill="#D8FFF0" opacity=".7"/>
+                    <path d="M28 90c18-13 32-10 45-1s25 8 37-2v22H28V90z" fill="#70CFC3" opacity=".65"/>
+                    <path d="M41 18h14L41 58z" fill="white" opacity=".2"/>
+                </g>
+                <path d="M55 16h10c0 4-2 7-5 7s-5-3-5-7z" fill="#347E81"/>
+                <circle cx="60" cy="18.5" r="1" fill="#8FD4C9"/>
+                <path d="M53 98h14" stroke="#EFFFFA" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+            </svg>`,
+        5: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="laptopFrame" x1="28" y1="15" x2="114" y2="91" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#F7FAFF"/>
+                        <stop offset=".35" stop-color="#B1C0D5"/>
+                        <stop offset=".75" stop-color="#647995"/>
+                        <stop offset="1" stop-color="#D5E0EF"/>
+                    </linearGradient>
+                    <linearGradient id="laptopScreen" x1="34" y1="23" x2="105" y2="78" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#122951"/>
+                        <stop offset=".52" stop-color="#285CB4"/>
+                        <stop offset="1" stop-color="#6C82E9"/>
+                    </linearGradient>
+                    <linearGradient id="laptopBase" x1="23" y1="89" x2="105" y2="105" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#A2B4CB"/>
+                        <stop offset=".42" stop-color="#F3F7FC"/>
+                        <stop offset=".7" stop-color="#B5C5D9"/>
+                        <stop offset="1" stop-color="#778DA8"/>
+                    </linearGradient>
+                    <linearGradient id="screenShine" x1="36" y1="20" x2="85" y2="73" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#85E8FF" stop-opacity=".65"/>
+                        <stop offset="1" stop-color="#95AAFF" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="70" cy="106" rx="52" ry="5" fill="#24466D" opacity=".17"/>
+                <rect x="25" y="13" width="90" height="72" rx="7" fill="url(#laptopFrame)"/>
+                <rect x="29" y="17" width="82" height="63" rx="3" fill="#0C1C35"/>
+                <rect x="32" y="20" width="76" height="57" rx="1" fill="url(#laptopScreen)"/>
+                <path d="M32 20h45L43 77H32z" fill="url(#screenShine)"/>
+                <path d="M32 66l25-23 15 13 19-23 17 19v25H32z" fill="#739FFF" opacity=".18"/>
+                <path d="M39 67l18-17 15 13 18-23" stroke="#A7F3F1" stroke-width="1.5" opacity=".75"/>
+                <circle cx="70" cy="15.5" r="1" fill="#465B75"/>
+                <path d="M22 84h96l12 15c1.7 2.2.2 5-2.7 5H12.7c-2.9 0-4.4-2.8-2.7-5l12-15z" fill="url(#laptopBase)"/>
+                <path d="M28 87h84l5 7H23l5-7z" fill="#7E92AD"/>
+                <path d="M32 88h76M28 91h84" stroke="#DDE7F3" stroke-width="1" stroke-dasharray="4 2"/>
+                <path d="M59 96h22l-2 5H61l-2-5z" fill="#9AAEC5" stroke="#E6EDF5" stroke-width=".6"/>
+                <path d="M55 102h30c-1 2-3.5 3-7 3H62c-3.5 0-6-1-7-3z" fill="#E4ECF5"/>
+                <path d="M12 103h116" stroke="#F5F9FF" stroke-width="1.2" opacity=".85"/>
+            </svg>`,
+        6: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="gameFrame" x1="22" y1="14" x2="119" y2="86" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#59647B"/>
+                        <stop offset=".25" stop-color="#1B2333"/>
+                        <stop offset=".75" stop-color="#090E18"/>
+                        <stop offset="1" stop-color="#3E4B63"/>
+                    </linearGradient>
+                    <linearGradient id="gameScreen" x1="29" y1="22" x2="111" y2="77" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#10152C"/>
+                        <stop offset=".5" stop-color="#302263"/>
+                        <stop offset="1" stop-color="#123D54"/>
+                    </linearGradient>
+                    <linearGradient id="gameNeon" x1="43" y1="64" x2="99" y2="34" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#B879FF"/>
+                        <stop offset=".5" stop-color="#737CFF"/>
+                        <stop offset="1" stop-color="#5CFFE1"/>
+                    </linearGradient>
+                    <linearGradient id="gameBase" x1="18" y1="85" x2="118" y2="105" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#202B3D"/>
+                        <stop offset=".5" stop-color="#536078"/>
+                        <stop offset="1" stop-color="#141D2C"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="70" cy="107" rx="56" ry="5" fill="#141B32" opacity=".25"/>
+                <path d="M26 14h88l5 7v64H21V21l5-7z" fill="url(#gameFrame)"/>
+                <path d="M27 21h86v57H27z" fill="#080D18"/>
+                <path d="M30 24h80v51H30z" fill="url(#gameScreen)"/>
+                <path d="M42 62l16-29 13 18 12-13 18 27-17-7-13 7-13-12-16 9z" stroke="url(#gameNeon)" stroke-width="2.2" stroke-linejoin="round"/>
+                <path d="M58 34l13 31 12-26M43 62l55-23" stroke="#A6B3FF" stroke-width=".7" opacity=".35"/>
+                <path d="M30 24h30L36 75h-6z" fill="white" opacity=".045"/>
+                <circle cx="70" cy="18" r="1" fill="#64758D"/>
+                <path d="M20 85h100l15 15c2 3-1 5-5 5H10c-4 0-7-2-5-5l15-15z" fill="url(#gameBase)"/>
+                <path d="M27 88h86l9 10H18l9-10z" fill="#111A29"/>
+                <path d="M31 90h78M26 94h88" stroke="url(#gameNeon)" stroke-width="1.5" stroke-dasharray="4 2" opacity=".85"/>
+                <path d="M59 99h22l3 4H56l3-4z" fill="#29364B" stroke="#77869D" stroke-width=".6"/>
+                <path d="M11 102h17M112 102h17" stroke="#6CFBE1" stroke-width="1.4" opacity=".8"/>
+                <path d="M62 82l8-3 8 3-8 2-8-2z" fill="#A379FF" opacity=".85"/>
+            </svg>`,
+        7: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="airFrame" x1="30" y1="17" x2="110" y2="84" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFFDF7"/>
+                        <stop offset=".35" stop-color="#DCD7C9"/>
+                        <stop offset=".7" stop-color="#A9B3B5"/>
+                        <stop offset="1" stop-color="#F5F2E9"/>
+                    </linearGradient>
+                    <linearGradient id="airScreen" x1="34" y1="21" x2="106" y2="79" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#DDF5F1"/>
+                        <stop offset=".5" stop-color="#91CBD3"/>
+                        <stop offset="1" stop-color="#7393C4"/>
+                    </linearGradient>
+                    <linearGradient id="airBase" x1="22" y1="85" x2="108" y2="101" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#BFC8C8"/>
+                        <stop offset=".45" stop-color="#FFFDF6"/>
+                        <stop offset="1" stop-color="#A7B2B7"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="70" cy="103" rx="47" ry="4" fill="#38566B" opacity=".13"/>
+                <rect x="30" y="17" width="80" height="67" rx="6" fill="url(#airFrame)"/>
+                <rect x="33" y="20" width="74" height="60" rx="2" fill="url(#airScreen)"/>
+                <circle cx="91" cy="38" r="15" fill="#E9FFF5" opacity=".5"/>
+                <path d="M33 67c18-17 32-23 46-13s20 8 28 2v24H33V67z" fill="#E5F3E8" opacity=".72"/>
+                <path d="M33 74c21-11 34-8 47 0s20 7 27 3v3H33z" fill="#9BCABB" opacity=".7"/>
+                <path d="M34 21h27L36 78h-2z" fill="white" opacity=".22"/>
+                <circle cx="70" cy="18.7" r=".8" fill="#819292"/>
+                <path d="M25 84h90l13 12c1 2-1 4-5 4H17c-4 0-6-2-5-4l13-12z" fill="url(#airBase)"/>
+                <path d="M31 87h78l7 6H24l7-6z" fill="#B5BEBE"/>
+                <path d="M35 88h70M30 91h80" stroke="#F7F7F0" stroke-width=".9" stroke-dasharray="4 2"/>
+                <path d="M59 94h22l-2 4H61l-2-4z" fill="#C3CCCB" stroke="#FAFBF6" stroke-width=".6"/>
+                <path d="M53 99h34" stroke="#FDFDF8" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>`,
+        8: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="tabFrame" x1="15" y1="20" x2="125" y2="99" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FAF7FF"/>
+                        <stop offset=".25" stop-color="#C7BCD9"/>
+                        <stop offset=".55" stop-color="#EEEAF7"/>
+                        <stop offset="1" stop-color="#8C829F"/>
+                    </linearGradient>
+                    <linearGradient id="tabScreen" x1="24" y1="29" x2="115" y2="90" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#342D69"/>
+                        <stop offset=".48" stop-color="#785AAE"/>
+                        <stop offset="1" stop-color="#E494B4"/>
+                    </linearGradient>
+                    <linearGradient id="tabPen" x1="103" y1="91" x2="127" y2="109" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FCFBFF"/>
+                        <stop offset=".5" stop-color="#C7C9D9"/>
+                        <stop offset="1" stop-color="#737B94"/>
+                    </linearGradient>
+                    <clipPath id="tabDisplay"><rect x="23" y="28" width="94" height="63" rx="4"/></clipPath>
+                </defs>
+                <ellipse cx="69" cy="104" rx="50" ry="4" fill="#4C3C69" opacity=".15"/>
+                <rect x="15" y="20" width="110" height="79" rx="11" fill="url(#tabFrame)"/>
+                <rect x="19" y="24" width="102" height="71" rx="7" fill="#252139"/>
+                <g clip-path="url(#tabDisplay)">
+                    <rect x="23" y="28" width="94" height="63" fill="url(#tabScreen)"/>
+                    <circle cx="82" cy="53" r="32" stroke="#F7CFE8" stroke-width="9" opacity=".18"/>
+                    <circle cx="82" cy="53" r="20" stroke="#FFE8F2" stroke-width="1" opacity=".5"/>
+                    <path d="M11 86c31-30 56-25 77-10s32 9 46-4v30H11z" fill="#D6B4E7" opacity=".36"/>
+                    <path d="M24 29h33L28 90h-4z" fill="white" opacity=".09"/>
+                </g>
+                <circle cx="118" cy="59.5" r="1.5" fill="#777087"/>
+                <path d="M104 92l20 14" stroke="#6F7488" stroke-width="6" stroke-linecap="round" opacity=".2"/>
+                <path d="M102 89l22 15" stroke="url(#tabPen)" stroke-width="4.5" stroke-linecap="round"/>
+                <path d="M124 104l4 4-5-2-1-2z" fill="#525B73"/>
+                <path d="M103 89l4 3" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>`,
+        9: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="hpBand" x1="35" y1="15" x2="105" y2="78" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#F4F2FF"/>
+                        <stop offset=".25" stop-color="#A6A8C7"/>
+                        <stop offset=".55" stop-color="#E6E9F8"/>
+                        <stop offset="1" stop-color="#686D91"/>
+                    </linearGradient>
+                    <linearGradient id="hpCup" x1="25" y1="57" x2="111" y2="102" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#565C89"/>
+                        <stop offset=".45" stop-color="#262C50"/>
+                        <stop offset="1" stop-color="#7778AA"/>
+                    </linearGradient>
+                    <linearGradient id="hpMetal" x1="30" y1="60" x2="48" y2="98" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#E4E8FA"/>
+                        <stop offset=".5" stop-color="#8D94B9"/>
+                        <stop offset="1" stop-color="#444C76"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="70" cy="107" rx="45" ry="4" fill="#323558" opacity=".16"/>
+                <path d="M35 67V53c0-24 14-39 35-39s35 15 35 39v14" stroke="#383E60" stroke-width="14" stroke-linecap="round"/>
+                <path d="M35 65V53c0-24 14-39 35-39s35 15 35 39v12" stroke="url(#hpBand)" stroke-width="9" stroke-linecap="round"/>
+                <path d="M42 49c2-18 13-28 28-28s26 10 28 28" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".48"/>
+                <path d="M34 58l-5 14M106 58l5 14" stroke="url(#hpMetal)" stroke-width="6" stroke-linecap="round"/>
+                <rect x="22" y="57" width="33" height="46" rx="14" fill="url(#hpCup)"/>
+                <rect x="85" y="57" width="33" height="46" rx="14" fill="url(#hpCup)"/>
+                <rect x="27" y="62" width="19" height="36" rx="9.5" fill="#171D38" stroke="#777EA6" stroke-width="1.2"/>
+                <rect x="94" y="62" width="19" height="36" rx="9.5" fill="#171D38" stroke="#777EA6" stroke-width="1.2"/>
+                <path d="M31 67v20M99 67v20" stroke="#A2A9CD" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+                <path d="M26 65c2-4 5-6 9-6M114 65c-2-4-5-6-9-6" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>
+                <circle cx="108" cy="91" r="1.8" fill="#82F4DD"/>
+            </svg>`,
+        10: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="mouseShell" x1="32" y1="15" x2="91" y2="105" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFFFFF"/>
+                        <stop offset=".27" stop-color="#DDE4F4"/>
+                        <stop offset=".6" stop-color="#A8B5D2"/>
+                        <stop offset="1" stop-color="#687A9E"/>
+                    </linearGradient>
+                    <linearGradient id="mouseSide" x1="29" y1="55" x2="90" y2="107" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#7686AB"/>
+                        <stop offset=".5" stop-color="#3D4C72"/>
+                        <stop offset="1" stop-color="#273657"/>
+                    </linearGradient>
+                    <linearGradient id="mouseWheel" x1="56" y1="24" x2="64" y2="44" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#7B8CAC"/>
+                        <stop offset=".5" stop-color="#263756"/>
+                        <stop offset="1" stop-color="#8A9DB9"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="61" cy="108" rx="32" ry="4" fill="#344569" opacity=".18"/>
+                <g transform="rotate(-9 60 60)">
+                    <path d="M60 13C39 13 29 31 28 57l-1 22c-1 19 12 30 33 30s34-11 33-30l-1-22C91 31 81 13 60 13z" fill="url(#mouseSide)"/>
+                    <path d="M60 9C39 9 29 27 28 53l-1 22c-1 19 12 30 33 30s34-11 33-30l-1-22C91 27 81 9 60 9z" fill="url(#mouseShell)"/>
+                    <path d="M60 10v42M29 52h62" stroke="#7183A5" stroke-width="1.2" opacity=".75"/>
+                    <path d="M34 29c5-10 13-15 22-16" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+                    <path d="M31 63c1 20 10 33 25 36" stroke="white" stroke-width="1.3" stroke-linecap="round" opacity=".28"/>
+                    <rect x="55.5" y="23" width="9" height="22" rx="4.5" fill="#C4D0E2"/>
+                    <rect x="57" y="25" width="6" height="17" rx="3" fill="url(#mouseWheel)"/>
+                    <path d="M60 28v10" stroke="#B8C9DE" stroke-width="1" stroke-dasharray="1.5 2"/>
+                    <path d="M54 99h12" stroke="#8B9AB8" stroke-width="2.5" stroke-linecap="round" opacity=".65"/>
+                </g>
+            </svg>`,
+        11: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="kbdBody" x1="18" y1="29" x2="122" y2="101" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#E5E9F5"/>
+                        <stop offset=".25" stop-color="#929DB6"/>
+                        <stop offset=".55" stop-color="#4C5876"/>
+                        <stop offset="1" stop-color="#232E49"/>
+                    </linearGradient>
+                    <linearGradient id="kbdDeck" x1="25" y1="35" x2="114" y2="91" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#3E4A68"/>
+                        <stop offset="1" stop-color="#1A2339"/>
+                    </linearGradient>
+                    <linearGradient id="kbdGlow" x1="16" y1="99" x2="126" y2="99" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#8B7CFF"/>
+                        <stop offset=".5" stop-color="#70D9FF"/>
+                        <stop offset="1" stop-color="#F093D6"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="70" cy="105" rx="56" ry="5" fill="#303959" opacity=".18"/>
+                <path d="M22 29h96c4 0 6 2 7 6l10 58c1 5-2 8-7 8H12c-5 0-8-3-7-8l10-58c1-4 3-6 7-6z" fill="url(#kbdBody)"/>
+                <path d="M23 34h94l11 57H12l11-57z" fill="url(#kbdDeck)"/>
+                <g stroke="#9DAAC3" stroke-width="7" stroke-linecap="round" stroke-dasharray="6 3">
+                    <path d="M27 45h84"/>
+                    <path d="M24 58h91"/>
+                    <path d="M21 71h96"/>
+                </g>
+                <g stroke="#DCE4F2" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="6 3" opacity=".65">
+                    <path d="M27 42.5h84"/>
+                    <path d="M24 55.5h91"/>
+                    <path d="M21 68.5h96"/>
+                </g>
+                <path d="M23 45h7" stroke="#F19BBD" stroke-width="7" stroke-linecap="round"/>
+                <path d="M106 71h10" stroke="#7FE0E7" stroke-width="7" stroke-linecap="round"/>
+                <path d="M21 84h14M108 84h9" stroke="#8797B5" stroke-width="7" stroke-linecap="round"/>
+                <rect x="45" y="80" width="52" height="8" rx="3" fill="#A5B2C9"/>
+                <path d="M49 81.5h44" stroke="#E5EBF5" stroke-width="1.2" stroke-linecap="round" opacity=".65"/>
+                <path d="M13 97h115" stroke="url(#kbdGlow)" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="M23 31h92" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
+            </svg>`,
+        12: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="dockBody" x1="22" y1="42" x2="119" y2="91" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#F4F7FC"/>
+                        <stop offset=".25" stop-color="#BAC6D8"/>
+                        <stop offset=".55" stop-color="#E7EDF6"/>
+                        <stop offset="1" stop-color="#73859F"/>
+                    </linearGradient>
+                    <linearGradient id="dockFront" x1="23" y1="63" x2="117" y2="91" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#7B8CA5"/>
+                        <stop offset=".5" stop-color="#AEBBD0"/>
+                        <stop offset="1" stop-color="#596D89"/>
+                    </linearGradient>
+                    <linearGradient id="dockCable" x1="119" y1="56" x2="128" y2="19" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#62728C"/>
+                        <stop offset="1" stop-color="#D2DBE8"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="70" cy="98" rx="52" ry="5" fill="#344664" opacity=".17"/>
+                <path d="M120 57c14-2 13-14 10-24l-2-8" stroke="url(#dockCable)" stroke-width="5" stroke-linecap="round"/>
+                <rect x="119" y="14" width="18" height="14" rx="4" fill="#8798AE" transform="rotate(14 119 14)"/>
+                <rect x="122" y="10" width="12" height="8" rx="3" fill="#D9E3EE" transform="rotate(14 122 10)"/>
+                <path d="M30 40h80c6 0 10 4 10 10v32c0 6-4 10-10 10H30c-6 0-10-4-10-10V50c0-6 4-10 10-10z" fill="url(#dockBody)"/>
+                <path d="M21 61h98v21c0 6-4 9-10 9H30c-6 0-9-3-9-9V61z" fill="url(#dockFront)"/>
+                <path d="M30 42h79" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+                <rect x="30" y="67" width="25" height="13" rx="2.5" fill="#28364D"/>
+                <rect x="34" y="70" width="17" height="6" rx="1" fill="#101B2D"/>
+                <path d="M37 72h11" stroke="#6E86A9" stroke-width="1"/>
+                <rect x="64" y="68" width="19" height="11" rx="5.5" fill="#2A3850"/>
+                <rect x="68" y="71" width="11" height="5" rx="2.5" fill="#101B2D"/>
+                <path d="M93 66h17l3 4v10H90V70l3-4z" fill="#2A3850"/>
+                <path d="M95 70h13l2 2v4H93v-4l2-2z" fill="#101B2D"/>
+                <circle cx="105" cy="51" r="2" fill="#78F0D0"/>
+                <path d="M34 52h32" stroke="#94A4BA" stroke-width="2" stroke-linecap="round" opacity=".45"/>
+            </svg>`,
+        13: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="watchStrap" x1="43" y1="2" x2="77" y2="118" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#5E6C8A"/>
+                        <stop offset=".3" stop-color="#263653"/>
+                        <stop offset=".65" stop-color="#172840"/>
+                        <stop offset="1" stop-color="#536580"/>
+                    </linearGradient>
+                    <linearGradient id="watchCase" x1="29" y1="28" x2="91" y2="96" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FCFDFF"/>
+                        <stop offset=".22" stop-color="#AEB9C9"/>
+                        <stop offset=".5" stop-color="#E3E8EF"/>
+                        <stop offset=".78" stop-color="#65778D"/>
+                        <stop offset="1" stop-color="#C6D0DC"/>
+                    </linearGradient>
+                    <linearGradient id="watchScreen" x1="36" y1="35" x2="84" y2="89" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#132C48"/>
+                        <stop offset=".55" stop-color="#101B35"/>
+                        <stop offset="1" stop-color="#252051"/>
+                    </linearGradient>
+                    <linearGradient id="watchRing" x1="48" y1="48" x2="74" y2="73" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#6FF4D4"/>
+                        <stop offset=".5" stop-color="#66C9FF"/>
+                        <stop offset="1" stop-color="#B18AFF"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="60" cy="112" rx="28" ry="4" fill="#233B56" opacity=".18"/>
+                <rect x="43" y="2" width="34" height="40" rx="11" fill="url(#watchStrap)"/>
+                <rect x="43" y="79" width="34" height="39" rx="11" fill="url(#watchStrap)"/>
+                <path d="M49 5v30M49 89v22" stroke="#A1B0C5" stroke-width="1.4" stroke-linecap="round" opacity=".35"/>
+                <path d="M54 9h12M54 15h12M54 103h12M54 109h12" stroke="#101E33" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+                <rect x="91" y="44" width="6" height="18" rx="3" fill="#77889D"/>
+                <path d="M94 47v12" stroke="#DCE4ED" stroke-width="1" stroke-dasharray="1 2"/>
+                <rect x="91" y="68" width="4" height="13" rx="2" fill="#66798F"/>
+                <rect x="28" y="27" width="64" height="70" rx="19" fill="url(#watchCase)"/>
+                <rect x="32" y="31" width="56" height="62" rx="16" fill="#253247"/>
+                <rect x="35" y="34" width="50" height="56" rx="13" fill="url(#watchScreen)"/>
+                <path d="M39 37h17L39 65z" fill="white" opacity=".07"/>
+                <circle cx="60" cy="60" r="15" stroke="#33425F" stroke-width="3"/>
+                <circle cx="60" cy="60" r="11" stroke="#33425F" stroke-width="3"/>
+                <circle cx="60" cy="60" r="7" stroke="#33425F" stroke-width="3"/>
+                <path d="M60 45a15 15 0 1 1-14 20" stroke="url(#watchRing)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M60 49a11 11 0 1 1-10 15" stroke="#6FE7D1" stroke-width="3" stroke-linecap="round"/>
+                <path d="M60 53a7 7 0 1 1-6 9" stroke="#E99AF4" stroke-width="3" stroke-linecap="round"/>
+                <path d="M54 82h12" stroke="#8AA5C9" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M36 30h30" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".75"/>
+            </svg>`,
+        14: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="bandStrap" x1="47" y1="3" x2="74" y2="117" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFD6C5"/>
+                        <stop offset=".25" stop-color="#E99C91"/>
+                        <stop offset=".55" stop-color="#C77479"/>
+                        <stop offset="1" stop-color="#F0AA99"/>
+                    </linearGradient>
+                    <linearGradient id="bandCase" x1="41" y1="27" x2="79" y2="96" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#F4E8E8"/>
+                        <stop offset=".25" stop-color="#B89CA6"/>
+                        <stop offset=".55" stop-color="#604C62"/>
+                        <stop offset="1" stop-color="#D4B5B8"/>
+                    </linearGradient>
+                    <linearGradient id="bandScreen" x1="47" y1="33" x2="74" y2="90" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#342742"/>
+                        <stop offset=".5" stop-color="#492B54"/>
+                        <stop offset="1" stop-color="#1D4053"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="60" cy="111" rx="22" ry="3.5" fill="#794C5C" opacity=".15"/>
+                <path d="M50 3h20c3 0 5 2 5 5l2 31H43l2-31c0-3 2-5 5-5z" fill="url(#bandStrap)"/>
+                <path d="M43 82h34l-2 30c0 3-2 5-5 5H50c-3 0-5-2-5-5l-2-30z" fill="url(#bandStrap)"/>
+                <path d="M51 7l-2 25M51 90l2 21" stroke="#FFF0E8" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>
+                <path d="M56 103h8M56 109h8" stroke="#A7626B" stroke-width="2.4" stroke-linecap="round"/>
+                <rect x="78" y="51" width="4" height="17" rx="2" fill="#9F7886"/>
+                <rect x="41" y="26" width="38" height="70" rx="19" fill="url(#bandCase)"/>
+                <rect x="44.5" y="29.5" width="31" height="63" rx="15.5" fill="#352C42"/>
+                <rect x="47" y="33" width="26" height="56" rx="13" fill="url(#bandScreen)"/>
+                <path d="M50 36h8l-8 27z" fill="white" opacity=".08"/>
+                <circle cx="60" cy="45" r="4" stroke="#FFBF9F" stroke-width="1.5"/>
+                <path d="M60 41v4l3 2" stroke="#FFDFC2" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M51 62h5l3-7 4 15 3-8h4" stroke="#FF9EAC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M54 78h12" stroke="#80E5D2" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="55" cy="83" r="1" fill="#7787A5"/>
+                <circle cx="60" cy="83" r="1" fill="#7787A5"/>
+                <circle cx="65" cy="83" r="1" fill="#7787A5"/>
+            </svg>`,
+        15: `
+            <svg class="device-art" viewBox="0 0 140 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="glassFrame" x1="15" y1="34" x2="126" y2="91" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#8997B0"/>
+                        <stop offset=".25" stop-color="#25334D"/>
+                        <stop offset=".55" stop-color="#596A87"/>
+                        <stop offset=".8" stop-color="#17253E"/>
+                        <stop offset="1" stop-color="#91A2BB"/>
+                    </linearGradient>
+                    <linearGradient id="glassLens" x1="21" y1="47" x2="116" y2="88" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#A7E8F1" stop-opacity=".72"/>
+                        <stop offset=".45" stop-color="#5487B9" stop-opacity=".6"/>
+                        <stop offset="1" stop-color="#7868B5" stop-opacity=".72"/>
+                    </linearGradient>
+                    <linearGradient id="glassShine" x1="26" y1="48" x2="55" y2="84" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity=".65"/>
+                        <stop offset="1" stop-color="white" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="70" cy="98" rx="52" ry="4" fill="#334A6A" opacity=".14"/>
+                <path d="M20 48L10 30c-1-3 1-5 4-4l24 13M120 48l10-18c1-3-1-5-4-4l-24 13" stroke="url(#glassFrame)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 43h44l-4 31c-1 10-7 16-17 16H32c-10 0-16-6-17-16l-2-19c-1-7 1-11 5-12zM122 43H78l4 31c1 10 7 16 17 16h9c10 0 16-6 17-16l2-19c1-7-1-11-5-12z" fill="url(#glassLens)" stroke="url(#glassFrame)" stroke-width="5" stroke-linejoin="round"/>
+                <path d="M61 51c5-6 13-6 18 0" stroke="url(#glassFrame)" stroke-width="5" stroke-linecap="round"/>
+                <path d="M22 49h26L25 76zM88 49h24L91 72z" fill="url(#glassShine)" opacity=".6"/>
+                <path d="M28 57h12M28 62h8M100 57h12M104 62h8" stroke="#C9FAFF" stroke-width="1.2" stroke-linecap="round" opacity=".8"/>
+                <path d="M24 82c3 4 7 5 12 5M116 82c-3 4-7 5-12 5" stroke="#A6E4EE" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+                <rect x="111" y="35" width="13" height="7" rx="3.5" fill="#26354F"/>
+                <circle cx="120" cy="38.5" r="2" fill="#79D9EF"/>
+                <circle cx="120" cy="38.5" r=".8" fill="#D9FFFF"/>
+            </svg>`,
+        16: `
+            <svg class="device-art" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="kidStrap" x1="39" y1="3" x2="81" y2="117" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#A8F1E6"/>
+                        <stop offset=".25" stop-color="#4CC9C5"/>
+                        <stop offset=".6" stop-color="#2797B5"/>
+                        <stop offset="1" stop-color="#72D9D0"/>
+                    </linearGradient>
+                    <linearGradient id="kidCase" x1="24" y1="29" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#8FE9F2"/>
+                        <stop offset=".25" stop-color="#4DB4E5"/>
+                        <stop offset=".58" stop-color="#5279D2"/>
+                        <stop offset="1" stop-color="#354F9F"/>
+                    </linearGradient>
+                    <linearGradient id="kidScreen" x1="35" y1="41" x2="85" y2="85" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#333D86"/>
+                        <stop offset=".5" stop-color="#5669C4"/>
+                        <stop offset="1" stop-color="#48B8C4"/>
+                    </linearGradient>
+                    <linearGradient id="kidButton" x1="95" y1="47" x2="101" y2="66" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFF0A8"/>
+                        <stop offset=".5" stop-color="#FFC766"/>
+                        <stop offset="1" stop-color="#E89945"/>
+                    </linearGradient>
+                </defs>
+                <ellipse cx="60" cy="111" rx="31" ry="4" fill="#275D82" opacity=".16"/>
+                <rect x="39" y="3" width="42" height="40" rx="14" fill="url(#kidStrap)"/>
+                <rect x="39" y="79" width="42" height="38" rx="14" fill="url(#kidStrap)"/>
+                <path d="M46 8v25M46 88v21" stroke="#D7FFF4" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+                <circle cx="60" cy="12" r="2.4" fill="#248A9F"/>
+                <circle cx="60" cy="21" r="2.4" fill="#248A9F"/>
+                <circle cx="60" cy="100" r="2.4" fill="#248A9F"/>
+                <circle cx="60" cy="109" r="2.4" fill="#248A9F"/>
+                <rect x="95" y="47" width="7" height="20" rx="3.5" fill="url(#kidButton)"/>
+                <rect x="23" y="28" width="74" height="69" rx="23" fill="url(#kidCase)"/>
+                <path d="M29 34c5-4 12-4 18-4M73 92c8 0 14-2 18-7" stroke="#C9FAFF" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+                <rect x="29" y="35" width="62" height="55" rx="17" fill="#D1F4F4"/>
+                <rect x="34" y="40" width="52" height="46" rx="13" fill="url(#kidScreen)"/>
+                <path d="M38 43h17L38 69z" fill="white" opacity=".09"/>
+                <circle cx="49" cy="58" r="2.5" fill="#FFF0B5"/>
+                <circle cx="71" cy="58" r="2.5" fill="#FFF0B5"/>
+                <path d="M49 69c6 7 16 7 22 0" stroke="#FFF0B5" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="42" cy="67" r="3" fill="#F6A8BD" opacity=".7"/>
+                <circle cx="78" cy="67" r="3" fill="#F6A8BD" opacity=".7"/>
+                <path d="M55 80h10" stroke="#BDF8EF" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="60" cy="32" r="1.6" fill="#27528E"/>
+            </svg>`
+    };
+
+    let cart = [];
+
+    // 页面切换
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+        document.getElementById(pageId).classList.add('show');
+
+        document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if (pageId === 'home') renderGoods('homeGrid', '全部');
+        if (pageId === 'goods') renderGoods('goodsGrid', '全部');
+        if (pageId === 'cart') renderCart();
+    }
+
+    // 两个页面共用首页图标，并隔离 SVG 内部 ID，避免跨页面引用串色
+    function getProductIcon(item, gridId) {
+        const icon = productIcons[item.id];
+        if (!icon) return item.icon;
+
+        const prefix = `${gridId}-product-${item.id}-`;
+        return icon
+            .replace(/id="([^"]+)"/g, `id="${prefix}$1"`)
+            .replace(/url\(#([^)]+)\)/g, `url(#${prefix}$1)`);
+    }
+
+    // 渲染商品列表
+    function renderGoods(gridId, category) {
+        const grid = document.getElementById(gridId);
+        let list = goodsList.filter(item => item.status === 1);
+
+        if (category !== '全部') {
+            list = list.filter(item => item.category === category);
+        }
+
+        grid.innerHTML = list.map(item => {
+            const cartItem = cart.find(cartItem => cartItem.id === item.id);
+            const count = cartItem ? cartItem.count : 0;
+
+            return `
+                <div class="goods-item">
+                    <div class="goods-img ${item.catClass}">
+                        <span class="goods-tag">${item.tag}</span>
+                        <span class="cart-count" data-product-id="${item.id}" aria-label="购物车中已有 ${count} 件" ${count === 0 ? 'hidden' : ''}>${count}</span>
+                        <span class="icon ${productIcons[item.id] ? 'product-icon' : ''}">${getProductIcon(item, gridId)}</span>
+                    </div>
+                    <div class="goods-body">
+                        <div class="goods-name">${item.name}</div>
+                        <div class="goods-category">${item.category}</div>
+                        <div class="goods-price">¥${item.price}</div>
+                        <button class="add-cart-btn" onclick="addCart(${item.id})">
+                            加入购物车
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 分类筛选
+    function filterCategory(category, page) {
+        const prefix = page === 'home' ? 'home' : 'goods';
+
+        document.querySelectorAll(`#${page} .category-btn`).forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        renderGoods(`${prefix}Grid`, category);
+    }
+
+    // 下架商品自动移出购物车，其他商品同步最新名称和价格
+    function syncCartWithGoods() {
+        cart = cart.reduce((validItems, cartItem) => {
+            const product = goodsList.find(item => item.id === cartItem.id);
+            if (product && product.status === 1) {
+                validItems.push({
+                    ...cartItem,
+                    name: product.name,
+                    price: product.price
+                });
+            }
+            return validItems;
+        }, []);
+    }
+
+    // 加入购物车
+    function addCart(id) {
+        const product = goodsList.find(item => item.id === id && item.status === 1);
+        if (!product) {
+            alert('该商品已下架，无法加入购物车！');
+            return;
+        }
+
+        const exist = cart.find(item => item.id === id);
+        if (exist) {
+            exist.count += 1;
+        } else {
+            cart.push({ id: product.id, name: product.name, price: product.price, count: 1 });
+        }
+        renderCart();
+    }
+
+    // 删除单个商品
+    function delItem(index) {
+        cart.splice(index, 1);
+        renderCart();
+    }
+
+    // 清空购物车
+    function clearCart() {
+        cart = [];
+        renderCart();
+    }
+
+    // 提交订单并写入 admin 共用的订单缓存
+    function submitOrder() {
+        goodsList = loadGoods();
+        syncCartWithGoods();
+
+        if (cart.length === 0) {
+            alert("购物车为空，不能下单！");
+            renderGoods('homeGrid', '全部');
+            renderGoods('goodsGrid', '全部');
+            renderCart();
+            return;
+        }
+
+        const total = cart.reduce((sum, item) => sum + item.price * item.count, 0);
+        const now = new Date();
+        let orders = [];
+
+        try {
+            const parsedOrders = JSON.parse(localStorage.getItem(ORDER_STORAGE_KEY) || '[]');
+            orders = Array.isArray(parsedOrders) ? parsedOrders : [];
+        } catch (error) {
+            console.warn('订单缓存读取失败，已重新创建订单列表。', error);
+        }
+
+        orders.unshift({
+            oid: `UP${now.getTime()}`,
+            items: cart.map(item => ({ ...item })),
+            productName: cart.map(item => `${item.name} × ${item.count}`).join('；'),
+            time: now.toLocaleString('zh-CN', { hour12: false }),
+            total,
+            status: 'pending'
+        });
+        localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(orders));
+
+        alert(`下单成功！订单总金额：¥${total}，感谢购买！`);
+        cart = [];
+        renderCart();
+    }
+
+    // 同步首页和全部商品页的购物车数量角标
+    function updateCartBadges() {
+        document.querySelectorAll('.cart-count[data-product-id]').forEach(badge => {
+            const productId = Number(badge.dataset.productId);
+            const cartItem = cart.find(item => item.id === productId);
+            const count = cartItem ? cartItem.count : 0;
+
+            badge.textContent = count;
+            badge.setAttribute('aria-label', `购物车中已有 ${count} 件`);
+            badge.hidden = count === 0;
+        });
+    }
+
+    // 渲染购物车
+    function renderCart() {
+        syncCartWithGoods();
+        updateCartBadges();
+
+        const cartList = document.getElementById("cartList");
+        const totalPrice = document.getElementById("totalPrice");
+          if (cart.length === 0) {
+            cartList.innerHTML = '<div class="empty-cart">购物车是空的，请添加商品</div>';
+            totalPrice.innerText = "0";
+            return;
+        }
+
+        cartList.innerHTML = cart.map((item, index) => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">
+                        单价 ¥${item.price} × ${item.count} = ¥${item.price * item.count}
+                    </div>
+                </div>
+                <button class="del-btn" onclick="delItem(${index})">删除</button>
+            </div>
+        `).join('');
+
+        let total = cart.reduce((sum, item) => sum + item.price * item.count, 0);
+        totalPrice.innerText = total;
+    }
+
+    // admin 在其他标签页修改商品后，立即刷新店铺并过滤购物车
+    window.addEventListener('storage', event => {
+        if (event.key !== GOODS_STORAGE_KEY) return;
+
+        goodsList = loadGoods();
+        renderGoods('homeGrid', '全部');
+        renderGoods('goodsGrid', '全部');
+        renderCart();
+    });
+
+    // 初始化
+    renderGoods('homeGrid', '全部');
+    renderGoods('goodsGrid', '全部');
+    renderCart();
+</script>
+</body>
+</html>
